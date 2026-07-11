@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class ReservationRequest {
 
-    @NotBlank
+    @NotBlank(message = "Customer name is mandatory")
     private String customerName;
 
     @NotNull

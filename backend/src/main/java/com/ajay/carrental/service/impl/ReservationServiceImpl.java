@@ -18,16 +18,16 @@ import com.ajay.carrental.service.ReservationService;
 import com.ajay.carrental.service.VehicleService;
 import com.ajay.carrental.util.DateUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ReservationServiceImpl implements ReservationService {
@@ -50,12 +50,14 @@ public class ReservationServiceImpl implements ReservationService {
         BigDecimal amount = calculateAmount(request);
         Reservation reservation = createReservation(request, customer, vehicle, amount);
         markVehicleReserved(vehicle);
+        log.info("Creating reservation for customer {}", request.getCustomerName());
         return reservationMapper.toResponse(reservation);
     }
 
     @Override
     public ReservationResponse modify(UUID reservationId, ReservationUpdateRequest request) {
 
+        log.info("Modifying reservation {}", reservationId);
         Reservation reservation = findReservation(reservationId);
         reservation.setStartDate(request.getStartDate());
         reservation.setEndDate(request.getEndDate());
@@ -71,12 +73,15 @@ public class ReservationServiceImpl implements ReservationService {
 
         reservation.setTotalAmount(amount);
         Reservation updatedReservation = reservationRepository.save(reservation);
+        log.info("Modified reservation {}", reservationId);
         return reservationMapper.toResponse(updatedReservation);
+
     }
 
     @Override
     public void cancel(UUID reservationId) {
 
+        log.info("Cancelling reservation {}", reservationId);
         Reservation reservation = findReservation(reservationId);
         if (reservation.getStatus() == ReservationStatus.CANCELLED) {
             return;
@@ -85,6 +90,7 @@ public class ReservationServiceImpl implements ReservationService {
         reservation.setStatus(ReservationStatus.CANCELLED);
         reservationRepository.save(reservation);
         vehicleService.markAvailable(reservation.getVehicle());
+        log.info("Cancelled reservation {}", reservationId);
     }
 
     @Override

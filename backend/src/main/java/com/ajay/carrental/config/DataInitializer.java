@@ -4,9 +4,11 @@ import com.ajay.carrental.entity.Vehicle;
 import com.ajay.carrental.enums.VehicleCategory;
 import com.ajay.carrental.repository.VehicleRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class DataInitializer implements CommandLineRunner {
@@ -76,6 +78,6 @@ public class DataInitializer implements CommandLineRunner {
                         .available(true)
                         .build());
 
-        System.out.println("Vehicle master data loaded.");
+        log.info("Loaded {} vehicles", vehicleRepository.count());
     }
 }

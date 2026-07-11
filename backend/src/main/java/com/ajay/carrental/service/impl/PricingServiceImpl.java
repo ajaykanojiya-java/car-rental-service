@@ -2,12 +2,14 @@ package com.ajay.carrental.service.impl;
 
 import com.ajay.carrental.dto.request.PricingRequest;
 import com.ajay.carrental.dto.response.PricingResponse;
+import com.ajay.carrental.enums.VehicleCategory;
 import com.ajay.carrental.service.PricingService;
 import com.ajay.carrental.strategy.PricingStrategy;
 import com.ajay.carrental.strategy.PricingStrategyFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
 
@@ -33,5 +35,11 @@ public class PricingServiceImpl implements PricingService {
                 .category(strategy.getVehicleCategory())
                 .totalAmount(strategy.calculatePrice(request))
                 .build();
+    }
+
+    @Override
+    public BigDecimal calculatePrice(VehicleCategory category, PricingRequest request) {
+        PricingStrategy strategy = strategyFactory.getStrategy(category);
+        return strategy.calculatePrice(request);
     }
 }

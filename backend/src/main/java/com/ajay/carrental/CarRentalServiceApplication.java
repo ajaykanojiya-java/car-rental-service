@@ -12,5 +12,4 @@ public class CarRentalServiceApplication {
         TimeZone.setDefault(TimeZone.getTimeZone("Asia/Kolkata"));
 		SpringApplication.run(CarRentalServiceApplication.class, args);
 	}
-
 }

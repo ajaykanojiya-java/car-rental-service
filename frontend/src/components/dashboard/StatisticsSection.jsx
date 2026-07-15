@@ -1,4 +1,11 @@
-import { Grid } from "@mui/material";
+import { useEffect, useState } from "react";
+
+import {
+  Alert,
+  CircularProgress,
+  Grid,
+  Box,
+} from "@mui/material";
 
 import {
   DirectionsCarFilled,
@@ -7,32 +14,74 @@ import {
   CurrencyRupee,
 } from "@mui/icons-material";
 
+import dashboardService from "../../services/dashboardService";
 import StatisticsCard from "./StatisticsCard";
 
-const statistics = [
-  {
-    title: "Total Cars",
-    value: "120",
-    icon: <DirectionsCarFilled color="primary" />,
-  },
-  {
-    title: "Reservations",
-    value: "45",
-    icon: <CalendarMonth color="primary" />,
-  },
-  {
-    title: "Active Rentals",
-    value: "18",
-    icon: <CarRental color="primary" />,
-  },
-  {
-    title: "Revenue",
-    value: "₹2,45,000",
-    icon: <CurrencyRupee color="primary" />,
-  },
-];
-
 const StatisticsSection = () => {
+  const [statistics, setStatistics] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    loadDashboard();
+  }, []);
+
+  const loadDashboard = async () => {
+    try {
+      setLoading(true);
+
+      const data = await dashboardService.getDashboardSummary();
+
+      setStatistics([
+        {
+          title: "Total Cars",
+          value: data.totalCars,
+          icon: <DirectionsCarFilled color="primary" />,
+        },
+        {
+          title: "Reservations",
+          value: data.reservations,
+          icon: <CalendarMonth color="primary" />,
+        },
+        {
+          title: "Active Rentals",
+          value: data.activeRentals,
+          icon: <CarRental color="primary" />,
+        },
+        {
+          title: "Revenue",
+          value: data.revenue,
+          icon: <CurrencyRupee color="primary" />,
+        },
+      ]);
+    } catch (err) {
+      setError("Unable to load dashboard.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        mt={5}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Alert severity="error">
+        {error}
+      </Alert>
+    );
+  }
+
   return (
     <Grid container spacing={3}>
       {statistics.map((stat) => (

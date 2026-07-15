@@ -10,4 +10,6 @@ public interface VehicleService {
     void markAvailable(Vehicle vehicle);
 
     void markUnavailable(Vehicle vehicle);
+
+    Long getTotalVehicleCount();
 }

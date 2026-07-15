@@ -35,4 +35,9 @@ public class VehicleServiceImpl implements VehicleService {
         vehicle.setAvailable(false);
         vehicleRepository.save(vehicle);
     }
+
+    @Override
+    public Long getTotalVehicleCount() {
+        return vehicleRepository.getTotalVehicleCount();
+    }
 }

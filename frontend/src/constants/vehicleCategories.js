@@ -1,0 +1,8 @@
+const VEHICLE_CATEGORIES = {
+  SEDAN: "SEDAN",
+  SUV: "SUV",
+  VAN: "VAN",
+  PICKUP_TRUCK: "PICKUP_TRUCK",
+};
+
+export default VEHICLE_CATEGORIES;

@@ -1,0 +1,33 @@
+import reservationService from "./reservationService";
+import vehicleService from "./vehicleService";
+
+const dashboardService = {
+  getDashboardSummary: async () => {
+    const [vehicleCount, reservations] = await Promise.all([
+      vehicleService.getVehicleCount(),
+      reservationService.getReservations(),
+    ]);
+
+    const activeReservations = reservations.filter(
+      (reservation) => reservation.status === "ACTIVE"
+    );
+
+    const revenue = activeReservations.reduce(
+      (sum, reservation) => sum + Number(reservation.totalAmount),
+      0
+    );
+
+    return {
+      totalCars: vehicleCount,
+      reservations: reservations.length,
+      activeRentals: activeReservations.length,
+      revenue: revenue.toLocaleString("en-IN", {
+        style: "currency",
+        currency: "INR",
+        maximumFractionDigits: 0,
+      }),
+    };
+  },
+};
+
+export default dashboardService;

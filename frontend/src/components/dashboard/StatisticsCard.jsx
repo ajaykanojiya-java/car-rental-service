@@ -20,11 +20,7 @@ const StatisticsCard = ({ title, value, icon }) => {
         },
       }}
     >
-      <CardContent
-        sx={{
-          p: 3,
-        }}
-      >
+      <CardContent sx={{ p: 3 }}>
         <Box
           sx={{
             display: "flex",
@@ -45,9 +41,7 @@ const StatisticsCard = ({ title, value, icon }) => {
 
         <Typography
           variant="h4"
-          sx={{
-            fontWeight: "bold",
-          }}
+          fontWeight="bold"
         >
           {value}
         </Typography>

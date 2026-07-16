@@ -2,19 +2,25 @@ import { useEffect, useState } from "react";
 
 import {
   Alert,
+  Box,
   CircularProgress,
   Grid,
-  Box,
 } from "@mui/material";
 
 import {
-  DirectionsCarFilled,
   CalendarMonth,
   CarRental,
   CurrencyRupee,
+  DirectionsCarFilled,
 } from "@mui/icons-material";
 
+import {
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
+
 import dashboardService from "../../services/dashboardService";
+import ROUTES from "../../constants/routes";
 import StatisticsCard from "./StatisticsCard";
 
 const StatisticsSection = () => {
@@ -22,15 +28,16 @@ const StatisticsSection = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    loadDashboard();
-  }, []);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const loadDashboard = async () => {
     try {
       setLoading(true);
+      setError("");
 
-      const data = await dashboardService.getDashboardSummary();
+      const data =
+        await dashboardService.getDashboardSummary();
 
       setStatistics([
         {
@@ -55,12 +62,23 @@ const StatisticsSection = () => {
         },
       ]);
     } catch (err) {
-      setError("Unable to load dashboard.");
       console.error(err);
+      setError("Unable to load dashboard.");
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadDashboard();
+
+    if (location.state?.refresh) {
+      navigate(ROUTES.DASHBOARD, {
+        replace: true,
+        state: null,
+      });
+    }
+  }, [location.state?.refresh]);
 
   if (loading) {
     return (

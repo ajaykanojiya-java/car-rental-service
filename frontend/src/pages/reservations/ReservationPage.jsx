@@ -3,10 +3,9 @@ import {
   Typography,
 } from "@mui/material";
 
-import StatisticsSection from "../../components/dashboard/StatisticsSection";
-import RecentReservations from "../../components/dashboard/RecentReservations";
+import ReservationForm from "../../components/reservation/ReservationForm";
 
-const Dashboard = () => {
+const ReservationPage = () => {
   return (
     <Container
       maxWidth="lg"
@@ -16,20 +15,17 @@ const Dashboard = () => {
     >
       <Typography
         variant="h4"
-        component="h1"
         sx={{
           fontWeight: "bold",
           mb: 4,
         }}
       >
-        Dashboard
+        Create Reservation
       </Typography>
 
-      <StatisticsSection />
-
-      <RecentReservations />
+      <ReservationForm />
     </Container>
   );
 };
 
-export default Dashboard;
+export default ReservationPage;

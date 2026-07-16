@@ -7,19 +7,19 @@ const reservationService = {
     return response.data;
   },
 
-  createReservation: async (reservation) => {
+  createReservation: async (reservationRequest) => {
     const response = await apiClient.post(
       API_ENDPOINTS.RESERVATIONS,
-      reservation
+      reservationRequest
     );
 
     return response.data;
   },
 
-  updateReservation: async (id, reservation) => {
+  updateReservation: async (id, reservationRequest) => {
     const response = await apiClient.put(
       `${API_ENDPOINTS.RESERVATIONS}/${id}`,
-      reservation
+      reservationRequest
     );
 
     return response.data;

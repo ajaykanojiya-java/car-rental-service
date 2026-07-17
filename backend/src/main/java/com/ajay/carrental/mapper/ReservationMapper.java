@@ -12,10 +12,12 @@ public class ReservationMapper {
         return ReservationResponse.builder()
                 .reservationId(reservation.getId())
                 .customerName(reservation.getCustomer().getName())
+                .customerEmail(reservation.getCustomer().getEmail())
                 .vehicleNumber(reservation.getVehicle().getVehicleNumber())
                 .category(reservation.getVehicle().getCategory())
                 .startDate(reservation.getStartDate())
                 .endDate(reservation.getEndDate())
+                .dailyMileage(reservation.getDailyMileage())
                 .totalAmount(reservation.getTotalAmount())
                 .status(reservation.getStatus())
                 .build();

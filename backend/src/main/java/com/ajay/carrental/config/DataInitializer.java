@@ -1,12 +1,16 @@
 package com.ajay.carrental.config;
 
+import com.ajay.carrental.entity.Customer;
 import com.ajay.carrental.entity.Vehicle;
 import com.ajay.carrental.enums.VehicleCategory;
+import com.ajay.carrental.repository.CustomerRepository;
 import com.ajay.carrental.repository.VehicleRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDate;
 
 @Slf4j
 @Component
@@ -14,6 +18,7 @@ import org.springframework.stereotype.Component;
 public class DataInitializer implements CommandLineRunner {
 
     private final VehicleRepository vehicleRepository;
+    private final CustomerRepository customerRepository;
 
     @Override
     public void run(String... args) {
@@ -78,6 +83,28 @@ public class DataInitializer implements CommandLineRunner {
                         .available(true)
                         .build());
 
+        customerRepository.save(
+                Customer.builder()
+                        .name("Ajay Kanojiya")
+                        .email("ajay.kanojiya@example.com")
+                        .licenseIssueDate(LocalDate.now().minusYears(5))
+                        .build());
+
+        customerRepository.save(
+                Customer.builder()
+                        .name("Raj Kumar")
+                        .email("raj.kumar@example.com")
+                        .licenseIssueDate(LocalDate.now().minusYears(3))
+                        .build());
+
+        customerRepository.save(
+                Customer.builder()
+                        .name("Priya Singh")
+                        .email("priya.singh@example.com")
+                        .licenseIssueDate(LocalDate.now().minusYears(4))
+                        .build());
+
         log.info("Loaded {} vehicles", vehicleRepository.count());
+        log.info("Loaded {} customers", customerRepository.count());
     }
 }

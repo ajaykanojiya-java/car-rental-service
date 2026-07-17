@@ -18,6 +18,8 @@ public class ReservationResponse {
 
     private String customerName;
 
+    private String customerEmail;
+
     private String vehicleNumber;
 
     private VehicleCategory category;
@@ -25,6 +27,8 @@ public class ReservationResponse {
     private LocalDate startDate;
 
     private LocalDate endDate;
+
+    private Integer dailyMileage;
 
     private BigDecimal totalAmount;
 

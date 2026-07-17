@@ -15,16 +15,17 @@ public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
 
     @Override
-    public Customer getOrCreateCustomer(String name, int licenseYears) {
+    public Customer getOrCreateCustomer(String name, String email, int licenseYears) {
 
-        return customerRepository.findByName(name)
-                .orElseGet(() -> createCustomer(name, licenseYears));
+        return customerRepository.findByEmail(email)
+                .orElseGet(() -> createCustomer(name, email, licenseYears));
     }
 
-    private Customer createCustomer(String name, int licenseYears) {
+    private Customer createCustomer(String name, String email, int licenseYears) {
 
         Customer customer = Customer.builder()
                 .name(name)
+                .email(email)
                 .licenseIssueDate(LocalDate.now().minusYears(licenseYears))
                 .build();
         return customerRepository.save(customer);

@@ -9,4 +9,5 @@ import java.util.UUID;
 
 public interface ReservationRepository extends JpaRepository<Reservation, UUID> {
     List<Reservation> findByStatus(ReservationStatus status);
+    List<Reservation> findByCustomerEmail(String email);
 }

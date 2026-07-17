@@ -53,4 +53,12 @@ public class ReservationController {
     public List<ReservationResponse> getAllReservations() {
         return reservationService.getAllReservations();
     }
+
+    /**
+     * Get all reservations by customer email.
+     */
+    @GetMapping("/customer/{email}")
+    public List<ReservationResponse> getReservationsByCustomerEmail(@PathVariable String email) {
+        return reservationService.getReservationsByCustomerEmail(email);
+    }
 }

@@ -17,6 +17,9 @@ public class ReservationRequest {
     @NotBlank(message = "Customer name is mandatory")
     private String customerName;
 
+    @NotBlank(message = "Customer email is mandatory")
+    private String customerEmail;
+
     @NotNull
     private VehicleCategory vehicleCategory;
 

@@ -103,12 +103,23 @@ public class ReservationServiceImpl implements ReservationService {
                 .toList();
     }
 
+    @Override
+    public List<ReservationResponse> getReservationsByCustomerEmail(String email) {
+
+        return reservationRepository.findByCustomerEmail(email)
+                .stream()
+                .map(reservationMapper::toResponse)
+                .sorted(Comparator.comparing(ReservationResponse::getCustomerName))
+                .toList();
+    }
+
     /*------------------------------------------------------*/
 
     private Customer getCustomer(ReservationRequest request) {
 
         return customerService.getOrCreateCustomer(
                 request.getCustomerName(),
+                request.getCustomerEmail(),
                 request.getLicenseYears());
     }
 

@@ -62,6 +62,12 @@ const ReservationConfirmationDialog = ({
           </Typography>
 
           <Typography>
+            <strong>Customer Email</strong>
+            <br />
+            {reservation.customerEmail}
+          </Typography>
+
+          <Typography>
             <strong>Vehicle Number</strong>
             <br />
             {reservation.vehicleNumber}

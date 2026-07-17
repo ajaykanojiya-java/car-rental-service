@@ -9,7 +9,8 @@ import MainLayout from "../layouts/MainLayout";
 
 import Dashboard from "../pages/dashboard/Dashboard";
 import PricingPage from "../pages/pricing/PricingPage";
-import ReservationPage from "../pages/reservations/ReservationPage";
+import CreateReservationPage from "../pages/reservations/CreateReservationPage";
+import ReservationManagementPage from "../pages/reservations/ReservationManagementPage";
 
 import ROUTES from "../constants/routes";
 
@@ -40,7 +41,12 @@ const AppRoutes = () => {
 
           <Route
             path={ROUTES.RESERVATIONS}
-            element={<ReservationPage />}
+            element={<ReservationManagementPage />}
+          />
+
+          <Route
+            path={ROUTES.CREATE_RESERVATION}
+            element={<CreateReservationPage />}
           />
         </Routes>
       </MainLayout>

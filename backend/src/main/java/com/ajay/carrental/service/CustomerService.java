@@ -4,6 +4,6 @@ import com.ajay.carrental.entity.Customer;
 
 public interface CustomerService {
 
-    Customer getOrCreateCustomer(String name, int licenseYears);
+    Customer getOrCreateCustomer(String name, String email, int licenseYears);
 
 }

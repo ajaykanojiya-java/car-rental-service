@@ -5,7 +5,7 @@ import {
 
 import ReservationForm from "../../components/reservation/ReservationForm";
 
-const ReservationPage = () => {
+const CreateReservationPage = () => {
   return (
     <Container
       maxWidth="lg"
@@ -28,4 +28,4 @@ const ReservationPage = () => {
   );
 };
 
-export default ReservationPage;
+export default CreateReservationPage;

@@ -16,6 +16,7 @@ import ReservationConfirmationDialog from "./ReservationConfirmationDialog";
 
 const initialForm = {
   customerName: "",
+  customerEmail: "",
   vehicleCategory: "",
   startDate: "",
   endDate: "",
@@ -88,6 +89,16 @@ const ReservationForm = () => {
             />
 
             <TextField
+              label="Customer Email"
+              name="customerEmail"
+              type="email"
+              value={formData.customerEmail}
+              onChange={handleChange}
+              required
+              fullWidth
+            />
+
+            <TextField
               select
               label="Vehicle Category"
               name="vehicleCategory"
@@ -96,9 +107,18 @@ const ReservationForm = () => {
               required
               fullWidth
             >
-              <MenuItem value="SEDAN">Sedan</MenuItem>
-              <MenuItem value="SUV">SUV</MenuItem>
-              <MenuItem value="VAN">Van</MenuItem>
+              <MenuItem value="SEDAN">
+                Sedan
+              </MenuItem>
+
+              <MenuItem value="SUV">
+                SUV
+              </MenuItem>
+
+              <MenuItem value="VAN">
+                Van
+              </MenuItem>
+
               <MenuItem value="PICKUP_TRUCK">
                 Pickup Truck
               </MenuItem>

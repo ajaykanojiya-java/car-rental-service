@@ -17,4 +17,6 @@ public interface ReservationService {
     void cancel(UUID reservationId);
 
     List<ReservationResponse> getAllReservations();
+
+    List<ReservationResponse> getReservationsByCustomerEmail(String email);
 }

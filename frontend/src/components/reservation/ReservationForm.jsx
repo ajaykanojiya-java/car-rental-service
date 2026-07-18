@@ -13,19 +13,22 @@ import {
 
 import reservationService from "../../services/reservationService";
 import ReservationConfirmationDialog from "./ReservationConfirmationDialog";
-
-const initialForm = {
-  customerName: "",
-  customerEmail: "",
-  vehicleCategory: "",
-  startDate: "",
-  endDate: "",
-  dailyMileage: "",
-  licenseYears: "",
-};
+import useAuth from "../../hooks/useAuth";
 
 const ReservationForm = () => {
-  const [formData, setFormData] = useState(initialForm);
+  const { displayName, email, role } = useAuth();
+
+  const isCustomer = role === "CUSTOMER";
+
+  const [formData, setFormData] = useState({
+    customerName: isCustomer ? displayName : "",
+    customerEmail: isCustomer ? email : "",
+    vehicleCategory: "",
+    startDate: "",
+    endDate: "",
+    dailyMileage: "",
+    licenseYears: "",
+  });
 
   const [loading, setLoading] = useState(false);
 
@@ -60,10 +63,23 @@ const ReservationForm = () => {
 
       setDialogOpen(true);
 
-      setFormData(initialForm);
+      setFormData({
+        customerName: isCustomer ? displayName : "",
+        customerEmail: isCustomer ? email : "",
+        vehicleCategory: "",
+        startDate: "",
+        endDate: "",
+        dailyMileage: "",
+        licenseYears: "",
+      });
     } catch (err) {
       console.error(err);
-      setError("Unable to create reservation.");
+      const apiError = err.response?.data;
+      if (apiError?.error === "Vehicle Not Available") {
+        setError(`${apiError.message} Please select a different category.`);
+      } else {
+        setError("Unable to create reservation.");
+      }
     } finally {
       setLoading(false);
     }
@@ -86,6 +102,9 @@ const ReservationForm = () => {
               onChange={handleChange}
               required
               fullWidth
+              InputProps={{
+                readOnly: isCustomer,
+              }}
             />
 
             <TextField
@@ -96,6 +115,9 @@ const ReservationForm = () => {
               onChange={handleChange}
               required
               fullWidth
+              InputProps={{
+                readOnly: isCustomer,
+              }}
             />
 
             <TextField

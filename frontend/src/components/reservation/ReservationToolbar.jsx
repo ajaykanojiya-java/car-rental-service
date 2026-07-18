@@ -10,13 +10,8 @@ import {
 } from "@mui/material";
 
 import {
-  Add as AddIcon,
   Search as SearchIcon,
 } from "@mui/icons-material";
-
-import { useNavigate } from "react-router-dom";
-
-import ROUTES from "../../constants/routes";
 
 const ReservationToolbar = ({
   searchText,
@@ -25,8 +20,6 @@ const ReservationToolbar = ({
   onStatusChange,
   onSearch,
 }) => {
-  const navigate = useNavigate();
-
   const handleKeyDown = (event) => {
     if (event.key === "Enter") {
       onSearch();
@@ -95,18 +88,7 @@ const ReservationToolbar = ({
           </Select>
         </FormControl>
 
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() =>
-            navigate(ROUTES.CREATE_RESERVATION)
-          }
-          sx={{
-            whiteSpace: "nowrap",
-          }}
-        >
-          Create Reservation
-        </Button>
+
       </Stack>
     </Box>
   );

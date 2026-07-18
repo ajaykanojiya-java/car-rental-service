@@ -10,7 +10,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
 
     properties:
@@ -28,6 +28,9 @@ spring:
           starttls:
             enable: true
             required: true
+jwt:
+  secret: 4d5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c4d5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c
+  expiration: 86400000
 
 app:
   otp:

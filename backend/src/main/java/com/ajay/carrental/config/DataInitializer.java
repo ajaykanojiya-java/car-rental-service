@@ -43,6 +43,27 @@ public class DataInitializer implements CommandLineRunner {
 
         vehicleRepository.save(
                 Vehicle.builder()
+                        .vehicleNumber("SED003")
+                        .category(VehicleCategory.SEDAN)
+                        .available(true)
+                        .build());
+
+        vehicleRepository.save(
+                Vehicle.builder()
+                        .vehicleNumber("SED004")
+                        .category(VehicleCategory.SEDAN)
+                        .available(true)
+                        .build());
+
+        vehicleRepository.save(
+                Vehicle.builder()
+                        .vehicleNumber("SED005")
+                        .category(VehicleCategory.SEDAN)
+                        .available(true)
+                        .build());
+
+        vehicleRepository.save(
+                Vehicle.builder()
                         .vehicleNumber("SUV001")
                         .category(VehicleCategory.SUV)
                         .available(true)
@@ -51,6 +72,20 @@ public class DataInitializer implements CommandLineRunner {
         vehicleRepository.save(
                 Vehicle.builder()
                         .vehicleNumber("SUV002")
+                        .category(VehicleCategory.SUV)
+                        .available(true)
+                        .build());
+
+        vehicleRepository.save(
+                Vehicle.builder()
+                        .vehicleNumber("SUV003")
+                        .category(VehicleCategory.SUV)
+                        .available(true)
+                        .build());
+
+        vehicleRepository.save(
+                Vehicle.builder()
+                        .vehicleNumber("SUV004")
                         .category(VehicleCategory.SUV)
                         .available(true)
                         .build());
@@ -71,6 +106,33 @@ public class DataInitializer implements CommandLineRunner {
 
         vehicleRepository.save(
                 Vehicle.builder()
+                        .vehicleNumber("VAN003")
+                        .category(VehicleCategory.VAN)
+                        .available(true)
+                        .build());
+
+        vehicleRepository.save(
+                Vehicle.builder()
+                        .vehicleNumber("VAN004")
+                        .category(VehicleCategory.VAN)
+                        .available(true)
+                        .build());
+        vehicleRepository.save(
+                Vehicle.builder()
+                        .vehicleNumber("VAN005")
+                        .category(VehicleCategory.VAN)
+                        .available(true)
+                        .build());
+
+        vehicleRepository.save(
+                Vehicle.builder()
+                        .vehicleNumber("VAN006")
+                        .category(VehicleCategory.VAN)
+                        .available(true)
+                        .build());
+
+        vehicleRepository.save(
+                Vehicle.builder()
                         .vehicleNumber("PICK001")
                         .category(VehicleCategory.PICKUP_TRUCK)
                         .available(true)
@@ -79,6 +141,57 @@ public class DataInitializer implements CommandLineRunner {
         vehicleRepository.save(
                 Vehicle.builder()
                         .vehicleNumber("PICK002")
+                        .category(VehicleCategory.PICKUP_TRUCK)
+                        .available(true)
+                        .build());
+
+        vehicleRepository.save(
+                Vehicle.builder()
+                        .vehicleNumber("PICK003")
+                        .category(VehicleCategory.PICKUP_TRUCK)
+                        .available(true)
+                        .build());
+        vehicleRepository.save(
+                Vehicle.builder()
+                        .vehicleNumber("PICK004")
+                        .category(VehicleCategory.PICKUP_TRUCK)
+                        .available(true)
+                        .build());
+
+        vehicleRepository.save(
+                Vehicle.builder()
+                        .vehicleNumber("PICK005")
+                        .category(VehicleCategory.PICKUP_TRUCK)
+                        .available(true)
+                        .build());
+        vehicleRepository.save(
+                Vehicle.builder()
+                        .vehicleNumber("PICK006")
+                        .category(VehicleCategory.PICKUP_TRUCK)
+                        .available(true)
+                        .build());
+        vehicleRepository.save(
+                Vehicle.builder()
+                        .vehicleNumber("PICK007")
+                        .category(VehicleCategory.PICKUP_TRUCK)
+                        .available(true)
+                        .build());
+        vehicleRepository.save(
+                Vehicle.builder()
+                        .vehicleNumber("PICK008")
+                        .category(VehicleCategory.PICKUP_TRUCK)
+                        .available(true)
+                        .build());
+
+        vehicleRepository.save(
+                Vehicle.builder()
+                        .vehicleNumber("PICK009")
+                        .category(VehicleCategory.PICKUP_TRUCK)
+                        .available(true)
+                        .build());
+        vehicleRepository.save(
+                Vehicle.builder()
+                        .vehicleNumber("PICK010")
                         .category(VehicleCategory.PICKUP_TRUCK)
                         .available(true)
                         .build());

@@ -5,6 +5,7 @@ import com.ajay.carrental.service.OtpService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -25,20 +26,20 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendOtpEmail(String toEmail) {
-        try {
-            String otp = otpService.generateOtp(toEmail);
-            
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom(fromEmail);
-            message.setTo(toEmail);
-            message.setSubject("Your Car Rental OTP Verification Code");
-            message.setText(buildEmailContent(otp));
+        String otp = otpService.generateOtp(toEmail);
 
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(fromEmail);
+        message.setTo(toEmail);
+        message.setSubject("Your Car Rental OTP Verification Code");
+        message.setText(buildEmailContent(otp));
+
+        try {
             mailSender.send(message);
             log.info("OTP email sent successfully to: {}", toEmail);
-        } catch (Exception e) {
+        } catch (MailException e) {
             log.error("Failed to send OTP email to: {}", toEmail, e);
-            throw new RuntimeException("Failed to send OTP email. Please try again later.");
+            throw new RuntimeException("Failed to send OTP email. Please try again later.", e);
         }
     }
 

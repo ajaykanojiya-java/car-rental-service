@@ -19,6 +19,7 @@ import useAuth from "../../hooks/useAuth";
 import ROUTES from "../../constants/routes";
 
 const CustomerLoginForm = () => {
+    console.log("CustomerLoginForm rendered");
     const navigate = useNavigate();
 
     const { loginAsCustomer } = useAuth();
@@ -36,6 +37,7 @@ const CustomerLoginForm = () => {
         useState(null);
 
     const handleGetOtp = async (event) => {
+        console.log(">>> handleGetOtp called");
         event.preventDefault();
 
         try {
@@ -56,7 +58,7 @@ const CustomerLoginForm = () => {
                     customerExists: true,
                 });
             } catch (err) {
-                if (err.response?.status === 404) {
+                if (err.response?.status === 404 || err.response?.status === 401) {
                     setCustomerInfo({
                         email,
                         displayName: email,
@@ -87,25 +89,43 @@ const CustomerLoginForm = () => {
     };
 
     const handleVerifyOtp = async (event) => {
+         console.log(">>> handleVerifyOtp called");
         event.preventDefault();
 
         try {
             setLoading(true);
             setError("");
 
-            const response =
+            const loginResponse =
                 await authService.verifyOtp(
                     email,
                     otp
                 );
+            console.log("STEP 1 - Login Response:", loginResponse);
 
-            if (!response.success) {
-                setError(response.message);
-                return;
-            }
+            // Store authenticated session (JWT + user details)
+            authService.login(loginResponse);
 
-            loginAsCustomer(customerInfo);
-            console.log("Customer Info:", customerInfo);
+            console.log(
+                "STEP 2 - JWT Storage:",
+                localStorage.getItem("car_rental_auth")
+            );
+
+            // Update AuthContext
+            loginAsCustomer({
+                email: loginResponse.email,
+                displayName:
+                    loginResponse.customerName ||
+                    loginResponse.email,
+                customerExists:
+                    !!loginResponse.customerName,
+            });
+
+            console.log(
+                "STEP 3 - Session Storage:",
+                localStorage.getItem("car-rental-auth-session")
+            );
+
             navigate(ROUTES.DASHBOARD);
         } catch (err) {
             console.error(err);
@@ -185,7 +205,7 @@ const CustomerLoginForm = () => {
                     ) : otpSent ? (
                         "Verify OTP"
                     ) : (
-                        "Get OTP"
+                        "Get OTP Test"
                     )}
                 </Button>
 

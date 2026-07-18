@@ -50,7 +50,7 @@ const PricingResults = ({ pricing }) => {
               </TableCell>
 
               <TableCell align="right">
-                ₹{item.totalAmount}
+                ${item.totalAmount}
               </TableCell>
             </TableRow>
           ))}

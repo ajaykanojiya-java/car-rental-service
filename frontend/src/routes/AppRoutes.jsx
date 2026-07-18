@@ -1,9 +1,14 @@
 import {
-  BrowserRouter,
-  Navigate,
-  Route,
-  Routes,
+    BrowserRouter,
+    Navigate,
+    Route,
+    Routes,
 } from "react-router-dom";
+
+import { AuthProvider } from "../context/AuthContext";
+
+import ProtectedRoute from "../components/auth/ProtectedRoute";
+import LoginPage from "../components/auth/LoginPage";
 
 import MainLayout from "../layouts/MainLayout";
 
@@ -15,43 +20,74 @@ import ReservationManagementPage from "../pages/reservations/ReservationManageme
 import ROUTES from "../constants/routes";
 
 const AppRoutes = () => {
-  return (
-    <BrowserRouter>
-      <MainLayout>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <Navigate
-                to={ROUTES.DASHBOARD}
-                replace
-              />
-            }
-          />
+    return (
+        <BrowserRouter>
+            <AuthProvider>
+                <Routes>
 
-          <Route
-            path={ROUTES.DASHBOARD}
-            element={<Dashboard />}
-          />
+                    {/* Public Routes */}
 
-          <Route
-            path={ROUTES.PRICING}
-            element={<PricingPage />}
-          />
+                    <Route
+                        path={ROUTES.LOGIN}
+                        element={<LoginPage />}
+                    />
 
-          <Route
-            path={ROUTES.RESERVATIONS}
-            element={<ReservationManagementPage />}
-          />
+                    {/* Protected Routes */}
 
-          <Route
-            path={ROUTES.CREATE_RESERVATION}
-            element={<CreateReservationPage />}
-          />
-        </Routes>
-      </MainLayout>
-    </BrowserRouter>
-  );
+                    <Route element={<ProtectedRoute />}>
+
+                        <Route element={<MainLayout />}>
+
+                            <Route
+                                path="/"
+                                element={
+                                    <Navigate
+                                        to={ROUTES.DASHBOARD}
+                                        replace
+                                    />
+                                }
+                            />
+
+                            <Route
+                                path={ROUTES.DASHBOARD}
+                                element={<Dashboard />}
+                            />
+
+                            <Route
+                                path={ROUTES.PRICING}
+                                element={<PricingPage />}
+                            />
+
+                            <Route
+                                path={ROUTES.RESERVATIONS}
+                                element={<ReservationManagementPage />}
+                            />
+
+                            <Route
+                                path={ROUTES.CREATE_RESERVATION}
+                                element={<CreateReservationPage />}
+                            />
+
+                        </Route>
+
+                    </Route>
+
+                    {/* Unknown Routes */}
+
+                    <Route
+                        path="*"
+                        element={
+                            <Navigate
+                                to="/"
+                                replace
+                            />
+                        }
+                    />
+
+                </Routes>
+            </AuthProvider>
+        </BrowserRouter>
+    );
 };
 
 export default AppRoutes;

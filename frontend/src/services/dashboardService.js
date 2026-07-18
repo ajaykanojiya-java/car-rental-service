@@ -2,11 +2,19 @@ import reservationService from "./reservationService";
 import vehicleService from "./vehicleService";
 
 const dashboardService = {
-  getDashboardSummary: async () => {
-    const [vehicleCount, reservations] = await Promise.all([
-      vehicleService.getVehicleCount(),
-      reservationService.getReservations(),
-    ]);
+  getDashboardSummary: async (role, email) => {
+    const reservationsPromise =
+        role === "ADMIN"
+            ? reservationService.getReservations()
+            : reservationService.getReservationsByCustomerEmail(
+                  email
+              );
+
+    const [vehicleCount, reservations] =
+        await Promise.all([
+            vehicleService.getVehicleCount(),
+            reservationsPromise,
+        ]);
 
     const activeReservations = reservations.filter(
       (reservation) => reservation.status === "ACTIVE"

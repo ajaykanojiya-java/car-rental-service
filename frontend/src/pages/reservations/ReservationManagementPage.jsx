@@ -3,10 +3,15 @@ import { useEffect, useState } from "react";
 import {
   Alert,
   Box,
+  Button,
   CircularProgress,
-  Container,
-  Typography,
 } from "@mui/material";
+
+import { useNavigate } from "react-router-dom";
+import ROUTES from "../../constants/routes";
+import PageContainer from "../../components/common/PageContainer";
+import PageHeader from "../../components/common/PageHeader";
+import PageSection from "../../components/common/PageSection";
 
 import reservationService from "../../services/reservationService";
 
@@ -17,6 +22,7 @@ import CommonDialog from "../../components/common/CommonDialog";
 import CommonSnackbar from "../../components/common/CommonSnackbar";
 
 import ReservationEditDialog from "../../components/reservation/ReservationEditDialog";
+import useAuth from "../../hooks/useAuth";
 
 const ReservationManagementPage = () => {
   const [reservations, setReservations] = useState([]);
@@ -63,9 +69,14 @@ const ReservationManagementPage = () => {
     message: "",
   });
 
+const navigate = useNavigate();
+const { role, email } = useAuth();
+
   useEffect(() => {
-    loadReservations();
-  }, []);
+      if (role) {
+          loadReservations();
+      }
+  }, [role, email]);
 
   useEffect(() => {
     let result = [...reservations];
@@ -94,7 +105,11 @@ const ReservationManagementPage = () => {
       setError("");
 
       const data =
-        await reservationService.getReservations();
+          role === "ADMIN"
+              ? await reservationService.getReservations()
+              : await reservationService.getReservationsByCustomerEmail(
+                    email
+                );
 
       setReservations(sortReservations(data));
     } catch (err) {
@@ -107,29 +122,39 @@ const ReservationManagementPage = () => {
   };
 
   const handleSearch = async () => {
-    try {
-      setLoading(true);
-      setError("");
+      try {
+          setLoading(true);
+          setError("");
 
-      const email = searchText.trim();
+          let data;
 
-      const data =
-        email === ""
-          ? await reservationService.getReservations()
-          : await reservationService.getReservationsByCustomerEmail(
-              email
-            );
+          if (role === "ADMIN") {
+              const searchEmail = searchText.trim();
 
-      setReservations(sortReservations(data));
-    } catch (err) {
-      console.error(err);
+              data =
+                  searchEmail === ""
+                      ? await reservationService.getReservations()
+                      : await reservationService.getReservationsByCustomerEmail(
+                            searchEmail
+                        );
+          } else {
+              // Customer can only view their own reservations.
+              data =
+                  await reservationService.getReservationsByCustomerEmail(
+                      email
+                  );
+          }
 
-      setReservations([]);
+          setReservations(sortReservations(data));
+      } catch (err) {
+          console.error(err);
 
-      setError("Unable to load reservations.");
-    } finally {
-      setLoading(false);
-    }
+          setReservations([]);
+
+          setError("Unable to load reservations.");
+      } finally {
+          setLoading(false);
+      }
   };
 
   /**
@@ -267,59 +292,71 @@ const handleSaveReservation = async (
 
   return (
     <>
-      <Container
-        maxWidth="xl"
-        sx={{
-          py: 4,
-        }}
-      >
-        <Typography
-          variant="h4"
-          sx={{
-            fontWeight: "bold",
-            mb: 4,
-          }}
-        >
-          Reservation Management
-        </Typography>
+      <PageContainer>
 
-        <ReservationToolbar
-          searchText={searchText}
-          statusFilter={statusFilter}
-          onSearchChange={setSearchText}
-          onStatusChange={setStatusFilter}
-          onSearch={handleSearch}
-        />
-
-        {loading && (
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              mt: 5,
-            }}
-          >
-            <CircularProgress />
-          </Box>
-        )}
-
-        {error && (
-          <Alert severity="error">
-            {error}
-          </Alert>
-        )}
-
-        {!loading && !error && (
-          <ReservationTable
-            reservations={filteredReservations}
-            page={page}
-            rowsPerPage={rowsPerPage}
-            onPageChange={handlePageChange}
-            onEdit={handleEdit}
-            onCancel={handleCancel}
+          <PageHeader
+              title="Reservation Management"
+              subtitle={
+                  role === "ADMIN"
+                      ? "Search, update and manage reservations."
+                      : "View and manage your reservations."
+              }
+              actions={
+                  <Button
+                      variant="contained"
+                      onClick={() =>
+                          navigate(ROUTES.CREATE_RESERVATION)
+                      }
+                  >
+                      New Reservation
+                  </Button>
+              }
           />
-        )}
-      </Container>
+
+          <PageSection>
+
+              {role === "ADMIN" && (
+                  <ReservationToolbar
+                      searchText={searchText}
+                      statusFilter={statusFilter}
+                      onSearchChange={setSearchText}
+                      onStatusChange={setStatusFilter}
+                      onSearch={handleSearch}
+                  />
+              )}
+
+              {loading && (
+                  <Box
+                      sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          mt: 5,
+                      }}
+                  >
+                      <CircularProgress />
+                  </Box>
+              )}
+
+              {error && (
+                  <Alert severity="error">
+                      {error}
+                  </Alert>
+              )}
+
+              {!loading && !error && (
+                  <ReservationTable
+                      reservations={filteredReservations}
+                      page={page}
+                      rowsPerPage={rowsPerPage}
+                      onPageChange={handlePageChange}
+                      onEdit={handleEdit}
+                      onCancel={handleCancel}
+                  />
+              )}
+
+          </PageSection>
+
+      </PageContainer>
 
       <ReservationEditDialog
         open={editDialogOpen}

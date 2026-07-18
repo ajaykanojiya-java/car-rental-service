@@ -22,6 +22,7 @@ import {
 import dashboardService from "../../services/dashboardService";
 import ROUTES from "../../constants/routes";
 import StatisticsCard from "./StatisticsCard";
+import useAuth from "../../hooks/useAuth";
 
 const StatisticsSection = () => {
   const [statistics, setStatistics] = useState([]);
@@ -30,6 +31,7 @@ const StatisticsSection = () => {
 
   const location = useLocation();
   const navigate = useNavigate();
+  const { role, email } = useAuth();
 
   const loadDashboard = async () => {
     try {
@@ -37,7 +39,10 @@ const StatisticsSection = () => {
       setError("");
 
       const data =
-        await dashboardService.getDashboardSummary();
+          await dashboardService.getDashboardSummary(
+              role,
+              email
+          );
 
       setStatistics([
         {
@@ -78,7 +83,11 @@ const StatisticsSection = () => {
         state: null,
       });
     }
-  }, [location.state?.refresh]);
+  }, [
+      location.state?.refresh,
+      role,
+      email,
+  ]);
 
   if (loading) {
     return (

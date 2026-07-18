@@ -1,35 +1,29 @@
-import {
-  Container,
-  Typography,
-} from "@mui/material";
+import PageContainer from "../../components/common/PageContainer";
+import PageHeader from "../../components/common/PageHeader";
+import PageSection from "../../components/common/PageSection";
 
 import StatisticsSection from "../../components/dashboard/StatisticsSection";
 import RecentReservations from "../../components/dashboard/RecentReservations";
 
 const Dashboard = () => {
-  return (
-    <Container
-      maxWidth="lg"
-      sx={{
-        py: 4,
-      }}
-    >
-      <Typography
-        variant="h4"
-        component="h1"
-        sx={{
-          fontWeight: "bold",
-          mb: 4,
-        }}
-      >
-        Dashboard
-      </Typography>
+    return (
+        <PageContainer>
 
-      <StatisticsSection />
+            <PageHeader
+                title="Dashboard"
+                subtitle="Monitor your car rental business at a glance."
+            />
 
-      <RecentReservations />
-    </Container>
-  );
+            <PageSection>
+                <StatisticsSection />
+            </PageSection>
+
+            <PageSection>
+                <RecentReservations />
+            </PageSection>
+
+        </PageContainer>
+    );
 };
 
 export default Dashboard;

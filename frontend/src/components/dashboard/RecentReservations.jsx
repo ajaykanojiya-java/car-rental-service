@@ -22,6 +22,7 @@ import {
 import reservationService from "../../services/reservationService";
 import ROUTES from "../../constants/routes";
 import ReservationStatusChip from "./ReservationStatusChip";
+import useAuth from "../../hooks/useAuth";
 
 const RecentReservations = () => {
   const [reservations, setReservations] = useState([]);
@@ -30,6 +31,7 @@ const RecentReservations = () => {
 
   const location = useLocation();
   const navigate = useNavigate();
+  const { role, email } = useAuth();
 
   const loadReservations = async () => {
     try {
@@ -37,7 +39,11 @@ const RecentReservations = () => {
       setError("");
 
       const data =
-        await reservationService.getReservations();
+          role === "ADMIN"
+              ? await reservationService.getReservations()
+              : await reservationService.getReservationsByCustomerEmail(
+                    email
+                );
 
       const latestReservations = [...data]
         .sort(
@@ -67,7 +73,11 @@ const RecentReservations = () => {
         state: null,
       });
     }
-  }, [location.state?.refresh]);
+  }, [
+      location.state?.refresh,
+      role,
+      email,
+  ]);
 
   const formatDate = (date) =>
     new Intl.DateTimeFormat("en-IN", {

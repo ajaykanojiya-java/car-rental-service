@@ -1,5 +1,6 @@
 package com.ajay.carrental.service.impl;
 
+import com.ajay.carrental.dto.response.CustomerResponse;
 import com.ajay.carrental.entity.Customer;
 import com.ajay.carrental.repository.CustomerRepository;
 import com.ajay.carrental.service.CustomerService;
@@ -21,6 +22,16 @@ public class CustomerServiceImpl implements CustomerService {
                 .orElseGet(() -> createCustomer(name, email, licenseYears));
     }
 
+    @Override
+    public CustomerResponse getCustomerByEmail(String email) {
+
+        return customerRepository.findByEmail(email)
+                .map(this::toCustomerResponse)
+                .orElseGet(() -> CustomerResponse.builder()
+                        .email(email)
+                        .build());
+    }
+
     private Customer createCustomer(String name, String email, int licenseYears) {
 
         Customer customer = Customer.builder()
@@ -29,5 +40,14 @@ public class CustomerServiceImpl implements CustomerService {
                 .licenseIssueDate(LocalDate.now().minusYears(licenseYears))
                 .build();
         return customerRepository.save(customer);
+    }
+
+    private CustomerResponse toCustomerResponse(Customer customer) {
+        return CustomerResponse.builder()
+                .id(customer.getId())
+                .name(customer.getName())
+                .email(customer.getEmail())
+                .licenseIssueDate(customer.getLicenseIssueDate())
+                .build();
     }
 }

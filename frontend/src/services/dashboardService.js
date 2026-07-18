@@ -26,14 +26,15 @@ const dashboardService = {
     );
 
     return {
-      totalCars: vehicleCount,
-      reservations: reservations.length,
-      activeRentals: activeReservations.length,
-      revenue: revenue.toLocaleString("en-IN", {
-        style: "currency",
-        currency: "INR",
-        maximumFractionDigits: 0,
-      }),
+        totalCars: vehicleCount,
+        availableCars: vehicleCount - activeReservations.length,
+        reservations: reservations.length,
+        activeRentals: activeReservations.length,
+        totalAmount: revenue.toLocaleString("en-IN", {
+            style: "currency",
+            currency: "USD",
+            maximumFractionDigits: 0,
+        }),
     };
   },
 };

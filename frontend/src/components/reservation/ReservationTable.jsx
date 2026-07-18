@@ -37,7 +37,7 @@ const ReservationTable = ({
   const formatCurrency = (amount) =>
     new Intl.NumberFormat("en-IN", {
       style: "currency",
-      currency: "INR",
+      currency: "USD",
       maximumFractionDigits: 0,
     }).format(Number(amount));
 

@@ -52,7 +52,7 @@ const CustomerLoginForm = () => {
 
                 setCustomerInfo({
                     email: customer.email,
-                    displayName: customer.email,
+                    displayName: customer.name,
                     customerExists: true,
                 });
             } catch (err) {
@@ -105,7 +105,7 @@ const CustomerLoginForm = () => {
             }
 
             loginAsCustomer(customerInfo);
-
+            console.log("Customer Info:", customerInfo);
             navigate(ROUTES.DASHBOARD);
         } catch (err) {
             console.error(err);

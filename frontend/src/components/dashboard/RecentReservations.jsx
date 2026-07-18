@@ -89,7 +89,7 @@ const RecentReservations = () => {
   const formatCurrency = (amount) =>
     new Intl.NumberFormat("en-IN", {
       style: "currency",
-      currency: "INR",
+      currency: "USD",
       maximumFractionDigits: 0,
     }).format(Number(amount));
 
@@ -124,13 +124,15 @@ const RecentReservations = () => {
       }}
     >
       <Typography
-        variant="h6"
-        sx={{
-          p: 2,
-          fontWeight: "bold",
-        }}
+          variant="h6"
+          sx={{
+              p: 2,
+              fontWeight: "bold",
+          }}
       >
-        Recent Reservations
+          {role === "ADMIN"
+              ? "Recent Reservations"
+              : "My Recent Reservations"}
       </Typography>
 
       <Table>

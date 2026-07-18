@@ -23,6 +23,8 @@ import dashboardService from "../../services/dashboardService";
 import ROUTES from "../../constants/routes";
 import StatisticsCard from "./StatisticsCard";
 import useAuth from "../../hooks/useAuth";
+import { CheckCircleOutline as CheckCircleOutlineIcon } from "@mui/icons-material";
+
 
 const StatisticsSection = () => {
   const [statistics, setStatistics] = useState([]);
@@ -44,28 +46,53 @@ const StatisticsSection = () => {
               email
           );
 
-      setStatistics([
-        {
-          title: "Total Cars",
-          value: data.totalCars,
-          icon: <DirectionsCarFilled color="primary" />,
-        },
-        {
-          title: "Reservations",
-          value: data.reservations,
-          icon: <CalendarMonth color="primary" />,
-        },
-        {
-          title: "Active Rentals",
-          value: data.activeRentals,
-          icon: <CarRental color="primary" />,
-        },
-        {
-          title: "Revenue",
-          value: data.revenue,
-          icon: <CurrencyRupee color="primary" />,
-        },
-      ]);
+      if (role === "ADMIN") {
+          setStatistics([
+              {
+                  title: "Total Cars",
+                  value: data.totalCars,
+                  icon: <DirectionsCarFilled color="primary" />,
+              },
+              {
+                  title: "Available Cars",
+                  value: data.availableCars,
+                  icon: <CheckCircleOutlineIcon color="success" />,
+              },
+              {
+                  title: "Reservations",
+                  value: data.reservations,
+                  icon: <CalendarMonth color="primary" />,
+              },
+              {
+                  title: "Active Rentals",
+                  value: data.activeRentals,
+                  icon: <CarRental color="primary" />,
+              },
+              {
+                  title: "Total Amount",
+                  value: data.totalAmount,
+                  icon: <CurrencyRupee color="primary" />,
+              },
+          ]);
+      } else {
+          setStatistics([
+              {
+                  title: "My Reservations",
+                  value: data.reservations,
+                  icon: <CalendarMonth color="primary" />,
+              },
+              {
+                  title: "My Active Rentals",
+                  value: data.activeRentals,
+                  icon: <CarRental color="primary" />,
+              },
+              {
+                  title: "Total Amount",
+                  value: data.totalAmount,
+                  icon: <CurrencyRupee color="primary" />,
+              },
+          ]);
+      }
     } catch (err) {
       console.error(err);
       setError("Unable to load dashboard.");
@@ -113,12 +140,13 @@ const StatisticsSection = () => {
     <Grid container spacing={3}>
       {statistics.map((stat) => (
         <Grid
-          key={stat.title}
-          size={{
-            xs: 12,
-            sm: 6,
-            lg: 3,
-          }}
+            key={stat.title}
+            size={{
+                xs: 12,
+                sm: 6,
+                md: role === "ADMIN" ? 4 : 4,
+                lg: role === "ADMIN" ? 2.4 : 4,
+            }}
         >
           <StatisticsCard
             title={stat.title}

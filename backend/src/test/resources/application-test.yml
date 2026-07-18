@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/car_rental_test_db
+    username: postgres
+    password: postgres
+
+  jackson:
+    time-zone: Asia/Kolkata
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+
+    show-sql: false
+
+logging:
+  level:
+    root: WARN

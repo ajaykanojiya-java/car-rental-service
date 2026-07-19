@@ -28,7 +28,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // OTP APIs
-                        .requestMatchers(HttpMethod.POST,"/api/v1/auth/send-otp","/api/v1/auth/verify-otp")
+                        .requestMatchers("/api/v1/auth/send-otp","/api/v1/auth/verify-otp","/actuator/**")
                         .permitAll()
 
                         // Swagger

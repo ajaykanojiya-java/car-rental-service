@@ -205,7 +205,7 @@ const CustomerLoginForm = () => {
                     ) : otpSent ? (
                         "Verify OTP"
                     ) : (
-                        "Get OTP Test"
+                        "Get OTP"
                     )}
                 </Button>
 

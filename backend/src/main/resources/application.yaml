@@ -28,6 +28,20 @@ spring:
           starttls:
             enable: true
             required: true
+  management:
+    endpoints:
+      web:
+        exposure:
+          include: health,info
+
+    endpoint:
+      health:
+        show-details: always
+
+    health:
+      defaults:
+        enabled: true
+
 jwt:
   secret: 4d5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c4d5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c
   expiration: 86400000

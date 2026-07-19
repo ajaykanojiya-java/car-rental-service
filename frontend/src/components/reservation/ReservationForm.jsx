@@ -102,9 +102,6 @@ const ReservationForm = () => {
               onChange={handleChange}
               required
               fullWidth
-              InputProps={{
-                readOnly: isCustomer,
-              }}
             />
 
             <TextField
@@ -115,9 +112,6 @@ const ReservationForm = () => {
               onChange={handleChange}
               required
               fullWidth
-              InputProps={{
-                readOnly: isCustomer,
-              }}
             />
 
             <TextField

@@ -18,7 +18,7 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     /**
-     * Send OTP to the provided email address.
+     * Send OTP to the provided address.
      */
     @PostMapping("/send-otp")
     public ResponseEntity<OtpResponse> sendOtp(@Valid @RequestBody SendOtpRequest request) {

@@ -3,14 +3,58 @@ import API_ENDPOINTS from "../constants/apiEndpoints";
 
 const AUTH_KEY = "car_rental_auth";
 
+const isPlainObject = (value) =>
+    typeof value === "object" &&
+    value !== null &&
+    !Array.isArray(value);
+
+const toTrimmedString = (value) =>
+    typeof value === "string" ? value.trim() : "";
+
 const authService = {
-    async sendOtp(email) {
-        const response = await apiClient.post(API_ENDPOINTS.SEND_OTP, { email });
+    async sendOtp(requestOrAddress, channel = "EMAIL") {
+        const payload = isPlainObject(requestOrAddress)
+            ? {
+                  address: toTrimmedString(requestOrAddress.address),
+                  channel: requestOrAddress.channel || "EMAIL",
+              }
+            : {
+                  address: toTrimmedString(requestOrAddress),
+                  channel,
+              };
+
+        const response = await apiClient.post(
+            API_ENDPOINTS.SEND_OTP,
+            JSON.stringify(payload),
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
+        );
         return response.data;
     },
 
-    async verifyOtp(email, otp) {
-        const response = await apiClient.post(API_ENDPOINTS.VERIFY_OTP, { email, otp });
+    async verifyOtp(requestOrAddress, otp) {
+        const payload = isPlainObject(requestOrAddress)
+            ? {
+                  address: toTrimmedString(requestOrAddress.address),
+                  otp: requestOrAddress.otp,
+              }
+            : {
+                  address: toTrimmedString(requestOrAddress),
+                  otp,
+              };
+
+        const response = await apiClient.post(
+            API_ENDPOINTS.VERIFY_OTP,
+            JSON.stringify(payload),
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
+        );
         return response.data;
     },
 

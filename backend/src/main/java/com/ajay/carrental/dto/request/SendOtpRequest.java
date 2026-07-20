@@ -1,7 +1,9 @@
 package com.ajay.carrental.dto.request;
 
+import com.ajay.carrental.enums.OtpChannel;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Data
@@ -9,8 +11,10 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SendOtpRequest {
-    
-    @Email(message = "Invalid email format")
-    @NotBlank(message = "Email is mandatory")
-    private String email;
+
+    @NotBlank
+    private String address;
+
+    @NotNull
+    private OtpChannel channel;
 }

@@ -9,12 +9,11 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OtpRequest {
-    
-    @Email(message = "Invalid email format")
-    @NotBlank(message = "Email is mandatory")
-    private String email;
-    
-    @NotBlank(message = "OTP is mandatory")
+
+    @NotBlank
+    private String address;
+
+    @NotBlank
     private String otp;
 }
 

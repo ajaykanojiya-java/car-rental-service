@@ -5,6 +5,10 @@ import {
     Box,
     Button,
     CircularProgress,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select,
     Stack,
     TextField,
     Typography,
@@ -25,6 +29,7 @@ const CustomerLoginForm = () => {
     const { loginAsCustomer } = useAuth();
 
     const [email, setEmail] = useState("");
+    const [otpChannel, setOtpChannel] = useState("EMAIL");
     const [otp, setOtp] = useState("");
 
     const [otpSent, setOtpSent] = useState(false);
@@ -40,37 +45,26 @@ const CustomerLoginForm = () => {
         console.log(">>> handleGetOtp called");
         event.preventDefault();
 
+        const address = email.trim();
+        if (!address) {
+            setError("Email address is required.");
+            return;
+        }
+
+        if (otpChannel === "SMS") {
+            setError("SMS OTP is not supported yet. Please choose EMAIL.");
+            return;
+        }
+
         try {
             setLoading(true);
             setError("");
 
-            let customer;
-
-            try {
-                customer =
-                    await customerService.getCustomerByEmail(
-                        email
-                    );
-
-                setCustomerInfo({
-                    email: customer.email,
-                    displayName: customer.name,
-                    customerExists: true,
-                });
-            } catch (err) {
-                if (err.response?.status === 404 || err.response?.status === 401) {
-                    setCustomerInfo({
-                        email,
-                        displayName: email,
-                        customerExists: false,
-                    });
-                } else {
-                    throw err;
-                }
-            }
-
             const response =
-                await authService.sendOtp(email);
+                await authService.sendOtp({
+                    address,
+                    channel: otpChannel,
+                });
 
             if (response.success) {
                 setOtpSent(true);
@@ -92,14 +86,27 @@ const CustomerLoginForm = () => {
          console.log(">>> handleVerifyOtp called");
         event.preventDefault();
 
+        const address = email.trim();
+        if (!address) {
+            setError("Email address is required.");
+            return;
+        }
+
+        if (!otp.trim()) {
+            setError("OTP is required.");
+            return;
+        }
+
         try {
             setLoading(true);
             setError("");
 
             const loginResponse =
                 await authService.verifyOtp(
-                    email,
-                    otp
+                    {
+                        address,
+                        otp: otp.trim(),
+                    }
                 );
             console.log("STEP 1 - Login Response:", loginResponse);
 
@@ -111,14 +118,36 @@ const CustomerLoginForm = () => {
                 localStorage.getItem("car_rental_auth")
             );
 
+            let customer;
+            try {
+                customer =
+                    await customerService.getCustomerByEmail(
+                        address
+                    );
+            } catch (profileError) {
+                console.error(profileError);
+                authService.logout();
+                setError(
+                    "Unable to load customer profile after login. Please try again."
+                );
+                return;
+            }
+
+            setCustomerInfo({
+                email: customer.email,
+                displayName:
+                    customer.name || loginResponse.customerName || address,
+                customerExists: !!customer.name,
+            });
+
             // Update AuthContext
             loginAsCustomer({
-                email: loginResponse.email,
+                email: customer.email || loginResponse.email,
                 displayName:
+                    customer.name ||
                     loginResponse.customerName ||
-                    loginResponse.email,
-                customerExists:
-                    !!loginResponse.customerName,
+                    address,
+                customerExists: !!customer.name,
             });
 
             console.log(
@@ -154,8 +183,8 @@ const CustomerLoginForm = () => {
                     variant="body2"
                     color="text.secondary"
                 >
-                    Enter your email address to receive
-                    a One-Time Password (OTP).
+                    Choose your OTP channel and enter
+                    your address.
                 </Typography>
 
                 {error && (
@@ -163,6 +192,41 @@ const CustomerLoginForm = () => {
                         {error}
                     </Alert>
                 )}
+
+                <FormControl
+                    fullWidth
+                    disabled={otpSent}
+                >
+                    <InputLabel id="otp-channel-label">
+                        OTP Channel
+                    </InputLabel>
+                    <Select
+                        labelId="otp-channel-label"
+                        label="OTP Channel"
+                        value={otpChannel}
+                        onChange={(event) => {
+                            setOtpChannel(
+                                event.target.value
+                            );
+                            setError("");
+                        }}
+                    >
+                        <MenuItem value="EMAIL">
+                            EMAIL
+                        </MenuItem>
+                        <MenuItem value="SMS">
+                            SMS
+                        </MenuItem>
+                    </Select>
+                </FormControl>
+
+                {!otpSent &&
+                    otpChannel === "SMS" && (
+                        <Alert severity="info">
+                            SMS OTP is coming soon.
+                            Please use EMAIL for now.
+                        </Alert>
+                    )}
 
                 <TextField
                     label="Email Address"
@@ -190,12 +254,27 @@ const CustomerLoginForm = () => {
                     />
                 )}
 
+                {customerInfo &&
+                    !customerInfo.customerExists && (
+                        <Alert severity="info">
+                            We could not find an
+                            existing customer profile
+                            for this email. You can
+                            still continue with OTP
+                            login.
+                        </Alert>
+                    )}
+
                 <Button
                     type="submit"
                     variant="contained"
                     size="large"
                     fullWidth
-                    disabled={loading}
+                    disabled={
+                        loading ||
+                        (!otpSent &&
+                            otpChannel === "SMS")
+                    }
                 >
                     {loading ? (
                         <CircularProgress
@@ -204,6 +283,8 @@ const CustomerLoginForm = () => {
                         />
                     ) : otpSent ? (
                         "Verify OTP"
+                    ) : otpChannel === "SMS" ? (
+                        "SMS Not Supported Yet"
                     ) : (
                         "Get OTP"
                     )}

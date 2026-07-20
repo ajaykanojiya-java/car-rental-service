@@ -131,8 +131,7 @@ com.ajay.carrental/
 │   ├── PricingService.java
 │   ├── VehicleService.java
 │   ├── CustomerService.java
-│   ├── OtpService.java
-│   └── EmailService.java
+│   └── OtpService.java
 │
 ├── service/impl/                      # Business logic implementations
 │   ├── AuthenticationServiceImpl.java
@@ -140,8 +139,14 @@ com.ajay.carrental/
 │   ├── PricingServiceImpl.java
 │   ├── VehicleServiceImpl.java
 │   ├── CustomerServiceImpl.java
-│   ├── OtpServiceImpl.java            # In-memory ConcurrentHashMap OTP store
-│   └── EmailServiceImpl.java
+│   └── OtpServiceImpl.java            # In-memory ConcurrentHashMap OTP store
+│
+├── notification/
+│   ├── NotificationDestination.java    # Delivery target abstraction
+│   ├── OtpDeliveryFactory.java         # Resolves delivery service by OtpChannel
+│   ├── OtpDeliveryService.java         # Channel-specific OTP delivery contract
+│   └── impl/
+│       └── EmailOtpDeliveryServiceImpl.java
 │
 ├── entity/
 │   ├── BaseEntity.java                # UUID PK, createdAt, updatedAt (@MappedSuperclass)
@@ -305,8 +310,8 @@ All endpoints require `Authorization: Bearer <JWT>` **except** those marked _Pub
 
 | Method | Path | Auth | Request Body | Response | Notes |
 |---|---|---|---|---|---|
-| `POST` | `/auth/send-otp` | Public | `{ email }` | `OtpResponse` | Sends OTP email; returns `success: false` if mail fails |
-| `POST` | `/auth/verify-otp` | Public | `{ email, otp }` | `LoginResponse` | Issues JWT; `admin@carrental.com` → role `ADMIN`, others → `CUSTOMER` |
+| `POST` | `/auth/send-otp` | Public | `{ address, channel }` | `OtpResponse` | Sends OTP through the requested channel; currently only `EMAIL` is implemented |
+| `POST` | `/auth/verify-otp` | Public | `{ address, otp }` | `LoginResponse` | Issues JWT; `admin@carrental.com` → role `ADMIN`, others → `CUSTOMER` |
 
 **`OtpResponse`**
 ```json
@@ -402,9 +407,9 @@ All endpoints require `Authorization: Bearer <JWT>` **except** those marked _Pub
 
 ### Customers
 
-| Method | Path | Status | Response | Notes |
-|---|---|---|---|---|
-| `GET` | `/customers/{email}` | `200` | `CustomerResponse` | If not found, returns object with only `email` set |
+| Method | Path | Status | Auth | Response | Notes |
+|---|---|---|---|---|---|
+| `GET` | `/customers/{email}` | `200` | JWT required | `CustomerResponse` | If not found, returns object with only `email` set |
 
 **`CustomerResponse`**
 ```json
@@ -485,22 +490,22 @@ Client                          Server
 ### Customer OTP Login
 
 ```
-1. Customer enters email
-2. POST /auth/send-otp { email }
+1. Customer enters email + selects OTP channel
+2. POST /auth/send-otp { address, channel }
    → OtpServiceImpl generates OTP, stores in ConcurrentHashMap
-   → EmailServiceImpl sends OTP email
+   → OtpDeliveryFactory resolves the channel-specific delivery service
+   → EmailOtpDeliveryServiceImpl sends OTP email (EMAIL only)
    → Returns { success: true, message: "..." }
 
 3. Customer enters OTP
-4. POST /auth/verify-otp { email, otp }
+4. POST /auth/verify-otp { address, otp }
    → OtpServiceImpl.verifyOtp() checks code
-   → CustomerService.getCustomerByEmail() (may return empty if new customer)
-   → JwtService.generateToken(email, role)
+   → JwtService.generateToken(address, role)
    → Returns LoginResponse { token, role, customerName, email }
 
-5. Frontend stores:
-   - JWT in localStorage key "car_rental_auth"
-   - Session in localStorage key "car-rental-auth-session"
+5. Frontend stores JWT in localStorage key "car_rental_auth"
+6. Frontend calls protected `GET /api/v1/customers/{email}` with JWT
+7. Frontend stores session in localStorage key "car-rental-auth-session"
 ```
 
 ### Admin Frontend-Only Login
@@ -518,6 +523,7 @@ Client                          Server
 - OTP state: **in-memory** `ConcurrentHashMap` in `OtpServiceImpl` (no Redis)
 - Expired OTP cleanup: `OtpCleanupScheduler` runs `@Scheduled` every **1 minute**
 - Config keys: `OTP_EXPIRATION_TIME_MS`, `OTP_MAX_VERIFICATION_ATTEMPTS`, `OTP_MAX_GENERATION_ATTEMPTS`
+- OTP notification is routed through `notification/OtpDeliveryFactory`; only `EMAIL` is currently registered.
 
 ### Dual localStorage Keys
 
@@ -526,7 +532,7 @@ Client                          Server
 | `car-rental-auth-session` | `{ authenticated, role, email, displayName, customerExists, loginTime }` | `AuthContext` / `authStorage.js` |
 | `car_rental_auth` | `{ token, role, email, customerName }` | Axios interceptor / `authService.js` |
 
-Customer login populates **both**. Admin login only populates `car-rental-auth-session`.
+Customer login populates **both** after OTP verification and customer profile lookup. Admin login only populates `car-rental-auth-session`.
 
 ---
 
@@ -906,4 +912,4 @@ npm run dev
 
 ---
 
-*Last updated: 2026-07-18*
+*Last updated: 2026-07-20*

@@ -1,0 +1,170 @@
+@startuml
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+top to bottom direction
+
+package "Controller Layer" {
+
+class AuthenticationController
+class ReservationController
+class PricingController
+class VehicleController
+class CustomerController
+
+AuthenticationController -[hidden]down-> ReservationController
+ReservationController -[hidden]down-> PricingController
+PricingController -[hidden]down-> VehicleController
+VehicleController -[hidden]down-> CustomerController
+
+}
+
+package "Service Layer" {
+
+interface AuthenticationService
+interface ReservationService
+interface PricingService
+interface VehicleService
+interface CustomerService
+interface OtpService
+
+class AuthenticationServiceImpl
+class ReservationServiceImpl
+class PricingServiceImpl
+class VehicleServiceImpl
+class CustomerServiceImpl
+class OtpServiceImpl
+
+AuthenticationService -[hidden]down-> ReservationService
+ReservationService -[hidden]down-> PricingService
+PricingService -[hidden]down-> VehicleService
+VehicleService -[hidden]down-> CustomerService
+CustomerService -[hidden]down-> OtpService
+
+AuthenticationServiceImpl -[hidden]down-> ReservationServiceImpl
+ReservationServiceImpl -[hidden]down-> PricingServiceImpl
+PricingServiceImpl -[hidden]down-> VehicleServiceImpl
+VehicleServiceImpl -[hidden]down-> CustomerServiceImpl
+CustomerServiceImpl -[hidden]down-> OtpServiceImpl
+
+AuthenticationService <|.. AuthenticationServiceImpl
+ReservationService <|.. ReservationServiceImpl
+PricingService <|.. PricingServiceImpl
+VehicleService <|.. VehicleServiceImpl
+CustomerService <|.. CustomerServiceImpl
+OtpService <|.. OtpServiceImpl
+
+}
+
+package "Repository Layer" {
+
+interface CustomerRepository
+interface VehicleRepository
+interface ReservationRepository
+
+CustomerRepository -[hidden]down-> VehicleRepository
+VehicleRepository -[hidden]down-> ReservationRepository
+
+}
+
+package "Strategy Pattern" {
+
+interface PricingStrategy
+
+class SedanPricingStrategy
+class SuvPricingStrategy
+class VanPricingStrategy
+class PickupTruckPricingStrategy
+
+class PricingStrategyFactory
+
+SedanPricingStrategy -[hidden]down-> SuvPricingStrategy
+SuvPricingStrategy -[hidden]down-> VanPricingStrategy
+VanPricingStrategy -[hidden]down-> PickupTruckPricingStrategy
+
+PricingStrategy <|.. SedanPricingStrategy
+PricingStrategy <|.. SuvPricingStrategy
+PricingStrategy <|.. VanPricingStrategy
+PricingStrategy <|.. PickupTruckPricingStrategy
+
+PricingStrategyFactory -up-> PricingStrategy
+
+}
+
+package "Security & Notification" {
+
+class JwtService
+class OtpDeliveryFactory
+
+JwtService -[hidden]down-> OtpDeliveryFactory
+
+}
+
+package "Entities" {
+
+class BaseEntity{
+UUID id
+LocalDateTime createdAt
+LocalDateTime updatedAt
+}
+
+class Customer{
+String name
+String email
+LocalDate licenseIssueDate
+}
+
+class Vehicle{
+String vehicleNumber
+VehicleCategory category
+boolean available
+}
+
+class Reservation{
+LocalDate startDate
+LocalDate endDate
+Integer dailyMileage
+BigDecimal totalAmount
+ReservationStatus status
+}
+
+BaseEntity -[hidden]down-> Customer
+Customer -[hidden]down-> Vehicle
+Vehicle -[hidden]down-> Reservation
+
+Customer --|> BaseEntity
+Vehicle --|> BaseEntity
+Reservation --|> BaseEntity
+
+}
+
+Reservation "*" -left-> "1" Customer
+Reservation "*" -right-> "1" Vehicle
+
+ReservationController -down-> ReservationService
+PricingController -down-> PricingService
+VehicleController -down-> VehicleService
+CustomerController -down-> CustomerService
+
+ReservationServiceImpl -down-> CustomerService
+
+ReservationServiceImpl -down-> VehicleService
+
+ReservationServiceImpl -down-> PricingService
+
+ReservationServiceImpl -down-> ReservationRepository
+
+CustomerServiceImpl -down-> CustomerRepository
+
+VehicleServiceImpl -down-> VehicleRepository
+
+PricingServiceImpl -down-> PricingStrategyFactory
+
+AuthenticationController -down-> AuthenticationService
+
+AuthenticationServiceImpl -down-> OtpService
+AuthenticationServiceImpl -down-> CustomerService
+AuthenticationServiceImpl -down-> JwtService
+AuthenticationServiceImpl -down-> OtpDeliveryFactory
+
+@enduml

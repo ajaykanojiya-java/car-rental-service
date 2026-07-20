@@ -1,0 +1,63 @@
+@startuml
+
+actor Customer
+
+participant "React UI" as UI
+
+participant ReservationController
+
+participant ReservationService
+
+participant CustomerService
+
+participant VehicleService
+
+participant PricingService
+
+participant PricingStrategyFactory
+
+participant PricingStrategy
+
+database PostgreSQL
+
+Customer -> UI : Fill reservation form
+
+UI -> ReservationController : POST /reservations
+
+ReservationController -> ReservationService : createReservation()
+
+ReservationService -> CustomerService : getOrCreateCustomer()
+
+CustomerService -> PostgreSQL : Find Customer
+
+alt Customer Not Found
+
+CustomerService -> PostgreSQL : Insert Customer
+
+end
+
+ReservationService -> VehicleService : getAvailableVehicle()
+
+VehicleService -> PostgreSQL : Find Available Vehicle
+
+ReservationService -> PricingService : calculatePrice()
+
+PricingService -> PricingStrategyFactory : getStrategy(category)
+
+PricingStrategyFactory --> PricingService : PricingStrategy
+
+PricingService -> PricingStrategy : calculate()
+
+PricingStrategy --> PricingService : Total Price
+
+ReservationService -> PostgreSQL : Save Reservation
+
+ReservationService -> PostgreSQL : Update Vehicle(available=false)
+
+ReservationService --> ReservationController : ReservationResponse
+
+ReservationController --> UI : HTTP 201 Created
+
+UI --> Customer : Reservation Successful
+
+@enduml

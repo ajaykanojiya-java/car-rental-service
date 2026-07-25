@@ -6,6 +6,7 @@ const API_ENDPOINTS = {
   PRICING: "/pricing/options",
   SEND_OTP: "/auth/send-otp",
   VERIFY_OTP: "/auth/verify-otp",
+  ADMIN_LOGIN: "/auth/admin-login",
   CUSTOMERS: "/customers",
 };
 

@@ -1,6 +1,7 @@
 package com.ajay.carrental.service.impl;
 
 import com.ajay.carrental.dto.auth.LoginResponse;
+import com.ajay.carrental.dto.request.AdminLoginRequest;
 import com.ajay.carrental.dto.request.OtpRequest;
 import com.ajay.carrental.dto.request.SendOtpRequest;
 import com.ajay.carrental.dto.response.CustomerResponse;
@@ -14,6 +15,8 @@ import com.ajay.carrental.notification.OtpDeliveryFactory;
 import com.ajay.carrental.service.OtpService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -21,12 +24,17 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService {
 
-    private static final String ADMIN_EMAIL = "admin@carrental.com";
-
     private final OtpDeliveryFactory otpDeliveryFactory;
     private final OtpService otpService;
     private final CustomerService customerService;
     private final JwtService jwtService;
+    private final PasswordEncoder passwordEncoder;
+
+    @Value("${app.admin.email}")
+    private String adminEmail;
+
+    @Value("${app.admin.password-hash}")
+    private String adminPasswordHash;
 
     @Override
     public OtpResponse sendOtp(SendOtpRequest request) {
@@ -63,7 +71,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
 
         CustomerResponse customer = customerService.getCustomerByEmail(request.getAddress());
-        String role = ADMIN_EMAIL.equalsIgnoreCase(request.getAddress()) ? "ADMIN" : "CUSTOMER";
+        String role = adminEmail.equalsIgnoreCase(request.getAddress()) ? "ADMIN" : "CUSTOMER";
         String token = jwtService.generateToken(request.getAddress(), role);
 
         return LoginResponse.builder()
@@ -71,6 +79,28 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .role(role)
                 .customerName(customer.getName())
                 .email(request.getAddress())
+                .build();
+    }
+
+    @Override
+    public LoginResponse adminLogin(AdminLoginRequest request) {
+        if (!adminEmail.equalsIgnoreCase(request.getEmail())) {
+            log.warn("Admin login attempt with invalid email: {}", request.getEmail());
+            throw new RuntimeException("Invalid admin credentials");
+        }
+
+        if (!passwordEncoder.matches(request.getPasswordHash(), adminPasswordHash)) {
+            log.warn("Admin login attempt with invalid password hash for email: {}", request.getEmail());
+            throw new RuntimeException("Invalid admin credentials");
+        }
+
+        String token = jwtService.generateToken(adminEmail, "ADMIN");
+
+        return LoginResponse.builder()
+                .token(token)
+                .role("ADMIN")
+                .customerName("Admin")
+                .email(adminEmail)
                 .build();
     }
 }

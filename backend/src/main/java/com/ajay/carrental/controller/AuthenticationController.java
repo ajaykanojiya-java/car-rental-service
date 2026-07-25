@@ -1,6 +1,7 @@
 package com.ajay.carrental.controller;
 
 import com.ajay.carrental.dto.auth.LoginResponse;
+import com.ajay.carrental.dto.request.AdminLoginRequest;
 import com.ajay.carrental.dto.request.OtpRequest;
 import com.ajay.carrental.dto.request.SendOtpRequest;
 import com.ajay.carrental.dto.response.OtpResponse;
@@ -34,5 +35,13 @@ public class AuthenticationController {
         return ResponseEntity.ok(
                 authenticationService.verifyOtpAndLogin(request)
         );
+    }
+
+    /**
+     * Admin login with email and password hash.
+     */
+    @PostMapping("/admin-login")
+    public ResponseEntity<LoginResponse> adminLogin(@Valid @RequestBody AdminLoginRequest request) {
+        return ResponseEntity.ok(authenticationService.adminLogin(request));
     }
 }

@@ -1,7 +1,6 @@
 import apiClient from "../api/axios";
 import API_ENDPOINTS from "../constants/apiEndpoints";
-
-const AUTH_KEY = "car_rental_auth";
+import { STORAGE_KEYS } from "../constants/authConstants";
 
 const isPlainObject = (value) =>
     typeof value === "object" &&
@@ -10,6 +9,17 @@ const isPlainObject = (value) =>
 
 const toTrimmedString = (value) =>
     typeof value === "string" ? value.trim() : "";
+
+const getSession = () => {
+    const session = localStorage.getItem(STORAGE_KEYS.AUTH_SESSION);
+    if (!session) return null;
+    try {
+        return JSON.parse(session);
+    } catch (error) {
+        console.error("Invalid authentication session.", error);
+        return null;
+    }
+};
 
 const authService = {
     async sendOtp(requestOrAddress, channel = "EMAIL") {
@@ -58,41 +68,51 @@ const authService = {
         return response.data;
     },
 
-    login(loginResponse) {
-        localStorage.setItem(
-            AUTH_KEY,
-            JSON.stringify({
-                token: loginResponse.token,
-                role: loginResponse.role,
-                email: loginResponse.email,
-                customerName: loginResponse.customerName,
-            })
+    async adminLogin(email, passwordHash) {
+        const response = await apiClient.post(
+            API_ENDPOINTS.ADMIN_LOGIN,
+            JSON.stringify({ email, passwordHash }),
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
         );
+        return response.data;
+    },
+
+    login(loginResponse) {
+        const session = {
+            token: loginResponse.token,
+            role: loginResponse.role,
+            email: loginResponse.email,
+            customerName: loginResponse.customerName,
+        };
+        localStorage.setItem(STORAGE_KEYS.AUTH_SESSION, JSON.stringify(session));
     },
 
     logout() {
-        localStorage.removeItem(AUTH_KEY);
+        localStorage.removeItem(STORAGE_KEYS.AUTH_SESSION);
     },
 
     getAuth() {
-        const auth = localStorage.getItem(AUTH_KEY);
-        return auth ? JSON.parse(auth) : null;
+        return getSession();
     },
 
     getToken() {
-        return this.getAuth()?.token || null;
+        return getSession()?.token || null;
     },
 
     getRole() {
-        return this.getAuth()?.role || null;
+        return getSession()?.role || null;
     },
 
     getEmail() {
-        return this.getAuth()?.email || null;
+        return getSession()?.email || null;
     },
 
     getCustomerName() {
-        return this.getAuth()?.customerName || null;
+        return getSession()?.customerName || null;
     },
 
     isAuthenticated() {

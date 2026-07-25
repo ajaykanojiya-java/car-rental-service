@@ -8,6 +8,7 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
+import authService from "../../services/authService";
 import ROUTES from "../../constants/routes";
 
 const AdminLoginForm = () => {
@@ -15,29 +16,39 @@ const AdminLoginForm = () => {
 
     const { loginAsAdmin } = useAuth();
 
+    const [email, setEmail] = useState("admin@carrental.com");
     const [hashKey, setHashKey] = useState("");
     const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    const handleLogin = (event) => {
+    const handleLogin = async (event) => {
         event.preventDefault();
 
         setError("");
+
+        if (!email.trim()) {
+            setError("Please enter the admin email.");
+            return;
+        }
 
         if (!hashKey.trim()) {
             setError("Please enter the admin hash key.");
             return;
         }
 
-        const success = loginAsAdmin(hashKey.trim());
+        setLoading(true);
 
-        if (!success) {
-            setError("Invalid admin hash key.");
-            return;
+        try {
+            const response = await authService.adminLogin(email.trim(), hashKey.trim());
+            loginAsAdmin(response);
+            navigate(ROUTES.DASHBOARD, {
+                replace: true,
+            });
+        } catch (err) {
+            setError(err.response?.data?.message || "Invalid admin credentials.");
+        } finally {
+            setLoading(false);
         }
-
-        navigate(ROUTES.DASHBOARD, {
-            replace: true,
-        });
     };
 
     return (
@@ -54,14 +65,26 @@ const AdminLoginForm = () => {
                 )}
 
                 <TextField
+                    label="Admin Email"
+                    type="email"
+                    fullWidth
+                    autoFocus
+                    value={email}
+                    onChange={(event) =>
+                        setEmail(event.target.value)
+                    }
+                    disabled={loading}
+                />
+
+                <TextField
                     label="Admin Hash Key"
                     type="password"
                     fullWidth
-                    autoFocus
                     value={hashKey}
                     onChange={(event) =>
                         setHashKey(event.target.value)
                     }
+                    disabled={loading}
                 />
 
                 <Button
@@ -69,8 +92,9 @@ const AdminLoginForm = () => {
                     variant="contained"
                     size="large"
                     fullWidth
+                    disabled={loading}
                 >
-                    Login
+                    {loading ? "Logging in..." : "Login"}
                 </Button>
             </Stack>
         </Box>

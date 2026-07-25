@@ -1,6 +1,5 @@
 import { createContext, useEffect, useMemo, useState } from "react";
 import {
-    ADMIN_HASH_KEY,
     AUTH_STATUS,
     USER_ROLES,
 } from "../constants/authConstants";
@@ -33,27 +32,22 @@ export const AuthProvider = ({ children }) => {
     /**
      * Admin Login
      *
-     * @param {string} hashKey
-     * @returns {boolean}
+     * @param {Object} loginResponse - Response from backend admin login
+     * @returns {void}
      */
-    const loginAsAdmin = (hashKey) => {
-        if (hashKey !== ADMIN_HASH_KEY) {
-            return false;
-        }
-
+    const loginAsAdmin = (loginResponse) => {
         const session = {
             authenticated: AUTH_STATUS.AUTHENTICATED,
             role: USER_ROLES.ADMIN,
-            email: null,
-            displayName: "ADMIN",
+            email: loginResponse.email,
+            displayName: loginResponse.customerName || "Admin",
             customerExists: false,
             loginTime: new Date().toISOString(),
+            token: loginResponse.token,
         };
 
         saveSession(session);
         setUser(session);
-
-        return true;
     };
 
     /**

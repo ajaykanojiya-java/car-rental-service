@@ -85,7 +85,7 @@
                      ▼
 ┌─────────────────────────────────────────────┐
 │         Spring Boot API Server              │
-│         http://localhost:8080/api/v1        │
+│         http://localhost:8090/api/v1        │
 │                                             │
 │  Controllers → Services → Repositories     │
 │  Strategy Pattern (Pricing)                │
@@ -302,7 +302,7 @@ customer ──< reservation >── vehicle
 
 ## 7. API Specification
 
-**Base URL:** `http://localhost:8080/api/v1`
+**Base URL:** `http://localhost:8090/api/v1`
 
 All endpoints require `Authorization: Bearer <JWT>` **except** those marked _Public_.
 
@@ -312,6 +312,7 @@ All endpoints require `Authorization: Bearer <JWT>` **except** those marked _Pub
 |---|---|---|---|---|---|
 | `POST` | `/auth/send-otp` | Public | `{ address, channel }` | `OtpResponse` | Sends OTP through the requested channel; currently only `EMAIL` is implemented |
 | `POST` | `/auth/verify-otp` | Public | `{ address, otp }` | `LoginResponse` | Issues JWT; `admin@carrental.com` → role `ADMIN`, others → `CUSTOMER` |
+| `POST` | `/auth/admin-login` | Public | `{ email, passwordHash }` | `LoginResponse` | Validates admin credentials (BCrypt); issues JWT with `ADMIN` role |
 
 **`OtpResponse`**
 ```json
@@ -321,6 +322,11 @@ All endpoints require `Authorization: Bearer <JWT>` **except** those marked _Pub
 **`LoginResponse`**
 ```json
 { "token": "...", "role": "CUSTOMER|ADMIN", "customerName": "...", "email": "..." }
+```
+
+**`AdminLoginRequest`**
+```json
+{ "email": "admin@carrental.com", "passwordHash": "ADMIN@2026" }
 ```
 
 ---
@@ -481,7 +487,12 @@ Client                          Server
 ### Admin Special Case
 
 - `admin@carrental.com` → receives role `ADMIN` in JWT
-- Frontend ADMIN login uses a static hash key (`ADMIN@2026`) validated on the **frontend only** — no backend admin endpoint; admin still goes through OTP flow using the admin email
+- **Admin Login Endpoint:** `POST /api/v1/auth/admin-login` validates admin credentials server-side using BCrypt password hash
+- Admin credentials stored in `application.yaml` via environment variables:
+  - `ADMIN_EMAIL` (default: `admin@carrental.com`)
+  - `ADMIN_PASSWORD_HASH` (BCrypt hash of `ADMIN@2026`)
+- Frontend calls backend admin login API; JWT with `ADMIN` role is issued and stored in localStorage
+- Previous frontend-only validation (`ADMIN@2026` hash key) has been replaced with backend-validated authentication
 
 ---
 
@@ -508,14 +519,17 @@ Client                          Server
 7. Frontend stores session in localStorage key "car-rental-auth-session"
 ```
 
-### Admin Frontend-Only Login
+### Admin Backend-Validated Login
 
 ```
-1. Admin enters hash key on Admin tab
-2. Frontend checks: hashKey === "ADMIN@2026"
-3. If match: AuthContext.loginAsAdmin() populates session
-   - No JWT issued (admin has no backend token)
-   - role: "ADMIN", displayName: "ADMIN"
+1. Admin enters email and password hash on Admin login tab
+2. Frontend calls POST /api/v1/auth/admin-login { email, passwordHash }
+3. Backend validates:
+   - Email matches configured ADMIN_EMAIL
+   - passwordHash matches BCrypt hash in ADMIN_PASSWORD_HASH
+4. On success: Backend issues JWT with role "ADMIN"
+5. Frontend stores JWT in localStorage (key: "car-rental-auth-session")
+6. AuthContext.loginAsAdmin() populates session with token, role, email
 ```
 
 ### OTP Service Implementation Notes
@@ -862,7 +876,7 @@ const doSomething = async () => {
 ### Frontend (`.env`)
 
 ```
-VITE_API_BASE_URL=http://localhost:8080/api/v1
+VITE_API_BASE_URL=http://localhost:8090/api/v1
 ```
 
 ### Frontend Auth Constants
@@ -890,8 +904,8 @@ STORAGE_KEYS   = { AUTH_SESSION: "car-rental-auth-session" }
 cd backend
 # set env vars: DB_USERNAME, DB_PASSWORD, MAIL_HOST, MAIL_PORT, MAIL_USERNAME, MAIL_PASSWORD
 ./mvnw spring-boot:run
-# API available at http://localhost:8080
-# Swagger UI at http://localhost:8080/swagger-ui.html
+# API available at http://localhost:8090
+# Swagger UI at http://localhost:8090/swagger-ui.html
 ```
 
 ### Frontend

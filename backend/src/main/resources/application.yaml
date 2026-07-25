@@ -52,6 +52,9 @@ app:
     expiration-time-minutes: 5
     max-verification-attempts: ${OTP_MAX_VERIFICATION_ATTEMPTS:3}
     max-generation-attempts: ${OTP_MAX_GENERATION_ATTEMPTS:5}
+  admin:
+    email: ${ADMIN_EMAIL:admin@carrental.com}
+    password-hash: ${ADMIN_PASSWORD_HASH:$2a$10$YkXNPMKLgJKorERUfhJLCea5P6BqHOyLVdMUluoLr.cWXNuS8R8GK}
 
 server:
-  port: 8080
+  port: 8090

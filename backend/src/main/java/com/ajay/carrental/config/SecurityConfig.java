@@ -10,6 +10,8 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -21,6 +23,11 @@ public class SecurityConfig {
     private final UnauthorizedEntryPoint unauthorizedEntryPoint;
 
     @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http.cors(Customizer.withDefaults())
@@ -28,7 +35,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // OTP APIs
-                        .requestMatchers("/api/v1/auth/send-otp","/api/v1/auth/verify-otp","/actuator/**")
+                        .requestMatchers("/api/v1/auth/send-otp","/api/v1/auth/verify-otp","/api/v1/auth/admin-login","/actuator/**")
                         .permitAll()
 
                         // Swagger
